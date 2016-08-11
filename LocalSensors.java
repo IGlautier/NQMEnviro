@@ -36,6 +36,11 @@ public class LocalSensors implements SensorEventListener { // Handles sensor eve
         // Sensors setup
         sensorManager = (SensorManager) context.getSystemService(context.SENSOR_SERVICE);
         sensors = sensorManager.getSensorList(Sensor.TYPE_ALL);
+        lastTemp = new SensorReading(0, System.currentTimeMillis());
+        lastLight = new SensorReading(0, System.currentTimeMillis());
+        lastPrsr = new SensorReading(0, System.currentTimeMillis());
+        lastHmty = new SensorReading(0, System.currentTimeMillis());
+
     }
 
     public boolean addSensor(int sensorType) {
@@ -65,17 +70,20 @@ public class LocalSensors implements SensorEventListener { // Handles sensor eve
 
     }
 
-    public JSONObject createJson(int time) {
+    public JSONArray createJson(long time) {
+        JSONArray data = new JSONArray();
         JSONObject json = new JSONObject();
         try {
             json.put("timestamp", time);
             json.put("light", lastLight.getValue());
             json.put("pressure", lastPrsr.getValue());
             json.put("humidity", lastHmty.getValue());
+            json.put("temperature", lastTemp.getValue());
+            data.put(json);
         } catch (JSONException e) {
             e.printStackTrace();
         }
-        return json;
+        return data;
     }
 
     public void onAccuracyChanged(Sensor sensor, int accuracy) {}
